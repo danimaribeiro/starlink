@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./app
+    command: python main.py
+    volumes:
+      - ./app/:/usr/src/app/
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgis/postgis
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=blue_onion
+      - POSTGRES_PASSWORD=onion_labs
+      - POSTGRES_DB=interview
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blue_onion -d interview"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
